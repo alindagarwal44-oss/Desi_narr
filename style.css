@@ -248,10 +248,24 @@ body::after {
   position: relative;
   background: #000;
   flex: 1 1 auto;
-  min-height: 200px;
-  aspect-ratio: 4 / 3;
+  min-height: 120px;
+  aspect-ratio: var(--vp-ar, 4 / 3);
   overflow: hidden;
   border-bottom: 3px solid var(--ink);
+}
+
+/* Maximized / fullscreen: window fills the screen, viewport flexes */
+#main-window.maximized {
+  position: fixed !important;
+  inset: 0 0 var(--taskbar-h) 0 !important;
+  width: auto !important;
+  height: auto !important;
+  box-shadow: none;
+  z-index: 90;
+}
+#main-window.maximized .viewport {
+  aspect-ratio: auto;
+  min-height: 0;
 }
 
 #video { display: none; }
@@ -450,4 +464,46 @@ body::after {
   border: 2px solid var(--paper);
   padding: 3px 10px;
   border-radius: 12px;
+}
+
+/* ---------------- Responsive (phones / small windows) ---------------- */
+
+.status-bar { flex-wrap: wrap; }
+
+@media (max-width: 720px) {
+  :root { --taskbar-h: 32px; }
+
+  body::before, body::after { display: none; }   /* drop speed lines */
+  #desktop::before, #desktop::after { font-size: 18px; opacity: .35; }
+
+  #main-window { width: 97vw; }
+  .xp-window { border-width: 3px; box-shadow: 5px 5px 0 var(--ink); }
+
+  .title-bar { height: 30px; }
+  .title-bar-text { font-size: 11px; letter-spacing: .5px; }
+  .tb-btn { width: 22px; height: 22px; }
+
+  .menu-bar { display: none; }
+
+  .toolbar { gap: 5px; padding: 5px; }
+  .toolbar-label { display: none; }
+  .style-btn { padding: 4px 8px 4px 5px; font-size: 10px; gap: 4px; }
+  .swatch { width: 16px; height: 12px; }
+  .xp-check { font-size: 9px; }
+  .toolbar-sep { display: none; }
+
+  .status-cell { min-width: 0; padding: 2px 6px; font-size: 9px; }
+
+  .task-item { display: none; }
+  #start-button { font-size: 12px; padding: 3px 12px; }
+  #tray::before { display: none; }
+
+  .xp-dialog { width: 92vw; }
+  .overlay-inner p { font-size: 12px; padding: 0 10px; }
+  .xp-button.big { font-size: 14px; padding: 9px 22px; }
+}
+
+@media (max-height: 500px) {
+  .menu-bar { display: none; }
+  #desktop::before, #desktop::after { display: none; }
 }

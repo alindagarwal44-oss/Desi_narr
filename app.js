@@ -792,6 +792,11 @@ async function start() {
     glCanvas.width = Math.round(canvas.width * scale);
     glCanvas.height = Math.round(canvas.height * scale);
 
+    // Match the viewport box to the real camera aspect ratio, then fit on screen.
+    document.getElementById("viewport").style
+      .setProperty("--vp-ar", `${canvas.width} / ${canvas.height}`);
+    fitWindow();
+
     initGL();
     await initTracking();
 
@@ -838,13 +843,28 @@ document.querySelectorAll("[data-close-dialog]").forEach((b) =>
   b.addEventListener("click", () => errorDialog.classList.add("hidden"))
 );
 
+// Size the window so the whole thing (chrome + video) fits on screen.
+function fitWindow() {
+  const win = document.getElementById("main-window");
+  if (win.classList.contains("maximized")) return;
+  const vp = document.getElementById("viewport");
+  const ar = video.videoWidth ? canvas.width / canvas.height : 4 / 3;
+  const chromeH = win.offsetHeight - vp.offsetHeight; // title/menu/toolbar/status
+  const availH = window.innerHeight - 34 /* taskbar */ - 24 /* margin */;
+  const maxW = Math.min(window.innerWidth * 0.97, 1100);
+  const w = Math.max(280, Math.min(maxW, (availH - chromeH) * ar));
+  win.style.width = w + "px";
+}
+window.addEventListener("resize", fitWindow);
+fitWindow();
+
 // Draggable main window via title bar
 (function makeDraggable() {
   const win = document.getElementById("main-window");
   const bar = document.getElementById("title-bar");
   let drag = null;
   bar.addEventListener("mousedown", (e) => {
-    if (e.target.closest(".tb-btn")) return;
+    if (e.target.closest(".tb-btn") || win.classList.contains("maximized")) return;
     const r = win.getBoundingClientRect();
     win.style.left = r.left + "px";
     win.style.top = r.top + "px";
@@ -874,14 +894,41 @@ document.getElementById("btn-min").addEventListener("click", () => {
     { once: true }
   );
 });
-document.getElementById("btn-max").addEventListener("click", () => {
+// Maximize = true fullscreen (falls back to fill-the-page where unsupported)
+function setMaximized(on) {
   const win = document.getElementById("main-window");
-  win.classList.toggle("maximized");
-  if (win.classList.contains("maximized")) {
-    Object.assign(win.style, { left: "0", top: "0", width: "100vw" });
+  win.classList.toggle("maximized", on);
+  if (on) {
+    Object.assign(win.style, { left: "", top: "", position: "" });
   } else {
-    Object.assign(win.style, { left: "", top: "", width: "" });
+    win.style.width = "";
+    fitWindow();
   }
+}
+
+document.getElementById("btn-max").addEventListener("click", async () => {
+  const win = document.getElementById("main-window");
+  const goingFull = !win.classList.contains("maximized");
+  if (goingFull) {
+    setMaximized(true);
+    try { await document.documentElement.requestFullscreen(); } catch { /* iOS etc. */ }
+  } else {
+    setMaximized(false);
+    if (document.fullscreenElement) {
+      try { await document.exitFullscreen(); } catch { /* ignore */ }
+    }
+  }
+});
+
+// Esc / system exit from fullscreen restores the windowed layout
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement) setMaximized(false);
+});
+
+// Double-click the title bar to toggle, like a real window manager
+document.getElementById("title-bar").addEventListener("dblclick", (e) => {
+  if (e.target.closest(".tb-btn")) return;
+  document.getElementById("btn-max").click();
 });
 
 // Taskbar clock
