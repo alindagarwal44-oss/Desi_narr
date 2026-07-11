@@ -516,13 +516,13 @@ function autoMixTick(now, maskActive) {
   if (!chkAutoMix.checked || !maskActive) return;
   if (now >= nextAutoSwitch) {
     setStyle(pickRandomStyle(), { fromAuto: true });
-    nextAutoSwitch = now + 700 + Math.random() * 1400;
+    nextAutoSwitch = now + 250 + Math.random() * 600;
   }
   // quick head shake forces an instant switch
-  if (headState.speed > 1.1 && now - lastShakeSwitch > 450) {
+  if (headState.speed > 1.1 && now - lastShakeSwitch > 300) {
     lastShakeSwitch = now;
     setStyle(pickRandomStyle(), { fromAuto: true });
-    nextAutoSwitch = now + 700 + Math.random() * 1400;
+    nextAutoSwitch = now + 250 + Math.random() * 600;
     bursts.push(now);
   }
 }
@@ -538,11 +538,11 @@ const HAND_LINKS = [
 ];
 
 function inkStroke(fn) {
-  // draw twice: fat black underlay, thin white top — manga ink look
-  ctx.strokeStyle = "rgba(17,17,17,0.85)";
+  // draw twice: dark underlay, glowing cyan top — modern HUD look
+  ctx.strokeStyle = "rgba(2,6,23,0.7)";
   ctx.lineWidth = 4;
   fn();
-  ctx.strokeStyle = "rgba(255,255,255,0.95)";
+  ctx.strokeStyle = "rgba(103,232,249,0.95)";
   ctx.lineWidth = 1.6;
   fn();
 }
@@ -677,7 +677,7 @@ function drawBursts(now, W, H) {
       const a = (l / 26) * Math.PI * 2 + bursts[i] * 0.001;
       const r0 = Math.min(W, H) * (0.28 + 0.1 * (l % 3));
       const r1 = Math.hypot(W, H) * 0.6;
-      ctx.strokeStyle = l % 2 ? "rgba(17,17,17,0.9)" : "rgba(255,255,255,0.9)";
+      ctx.strokeStyle = l % 2 ? "rgba(34,211,238,0.9)" : "rgba(255,255,255,0.9)";
       ctx.lineWidth = 2 + (l % 3);
       ctx.beginPath();
       ctx.moveTo(Math.cos(a) * r0, Math.sin(a) * r0);
@@ -735,17 +735,17 @@ function drawFrame() {
     ctx.drawImage(glCanvas, 0, 0, W, H);
     ctx.restore();
 
-    // Quad border — ink pen: solid black under dashed white
+    // Quad border — neon edge: dark underlay + dashed cyan
     ctx.beginPath();
     ctx.moveTo(quad[0].x, quad[0].y);
     for (let i = 1; i < 4; i++) ctx.lineTo(quad[i].x, quad[i].y);
     ctx.closePath();
-    ctx.strokeStyle = "rgba(17, 17, 17, 0.95)";
+    ctx.strokeStyle = "rgba(2, 6, 23, 0.8)";
     ctx.lineWidth = 6;
     ctx.stroke();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
-    ctx.lineWidth = 3;
-    ctx.setLineDash([10, 6]);
+    ctx.strokeStyle = "rgba(34, 211, 238, 0.95)";
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([12, 8]);
     ctx.stroke();
     ctx.setLineDash([]);
   }
@@ -850,7 +850,7 @@ function fitWindow() {
   const vp = document.getElementById("viewport");
   const ar = video.videoWidth ? canvas.width / canvas.height : 4 / 3;
   const chromeH = win.offsetHeight - vp.offsetHeight; // title/menu/toolbar/status
-  const availH = window.innerHeight - 34 /* taskbar */ - 24 /* margin */;
+  const availH = window.innerHeight - 68 /* dock */ - 24 /* margin */;
   const maxW = Math.min(window.innerWidth * 0.97, 1100);
   const w = Math.max(280, Math.min(maxW, (availH - chromeH) * ar));
   win.style.width = w + "px";
@@ -882,7 +882,7 @@ fitWindow();
 
 // Title-bar buttons
 document.getElementById("btn-close").addEventListener("click", () => {
-  showError("To be continued… (Reload the page to restart AnimeCam.)");
+  showError("AnimeCam closed. Reload the page to restart.");
   document.getElementById("main-window").style.display = "none";
 });
 document.getElementById("btn-min").addEventListener("click", () => {
