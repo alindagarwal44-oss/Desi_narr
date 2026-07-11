@@ -29,7 +29,13 @@ python3 -m http.server 8080
 
 Click **Start Camera**, allow camera access, and frame something with your hands.
 
-- **Show trackers** checkbox: draws the four tracked fingertips.
+- **Auto mix** checkbox: while the mask is active, styles switch randomly every
+  ~1–2 s. A quick head shake forces an instant switch (with a speed-line burst).
+  Picking a style manually pauses auto mix.
+- **Trackers** checkbox: animated fingertip reticles, hand skeletons, and a
+  head-tilt indicator.
+- **Head motion**: head tilt rotates the manga screentone and oil brush
+  direction; head position shifts the anime/retro palette.
 - **`?demo` URL flag** (`http://localhost:8080/?demo`): forces a static mask so
   you can preview styles without hand tracking.
 
@@ -41,9 +47,11 @@ Click **Start Camera**, allow camera access, and frame something with your hands
 - **Mask** — the 4 fingertips are sorted by angle around their centroid so the
   quad never self-intersects, exponentially smoothed to reduce jitter, and used
   as a canvas clip path.
-- **Stylization** — the video frame is rendered through a WebGL fragment shader
-  (one per style) on an offscreen canvas, then composited into the clipped
-  region. The whole scene is mirrored so it behaves like a mirror.
+- **Stylization** — two-pass WebGL: an edge-preserving bilateral smoothing pass
+  (clean cel regions), then a per-style pass with XDoG ink lines (anime/manga/
+  retro) or an 8-sector generalized Kuwahara (oil). A FaceLandmarker feeds head
+  tilt/position/speed into the shaders as uniforms. The whole scene is mirrored
+  so it behaves like a mirror.
 
 ## Files
 
