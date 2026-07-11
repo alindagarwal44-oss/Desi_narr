@@ -1,0 +1,344 @@
+/* ============ Windows XP (Luna) inspired theme ============ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --luna-blue-1: #0a246a;
+  --luna-blue-2: #0058ee;
+  --luna-blue-3: #3a93ff;
+  --luna-face: #ece9d8;
+  --luna-face-dark: #d4d0c8;
+  --taskbar-h: 34px;
+}
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: Tahoma, "Segoe UI", Geneva, Verdana, sans-serif;
+  font-size: 11px;
+  /* Bliss-style sky & hill */
+  background:
+    radial-gradient(ellipse 120% 55% at 50% 108%, #4c9b2f 0%, #67b53f 28%, #8fce5f 42%, transparent 58%),
+    linear-gradient(#2568c8 0%, #5a9ae0 35%, #9cc7ef 60%, #cfe6f8 75%, #e8f4fb 100%);
+  height: 100%;
+}
+
+#desktop {
+  position: relative;
+  height: calc(100% - var(--taskbar-h));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------------- Window chrome ---------------- */
+
+.xp-window {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: var(--luna-face);
+  border: 1px solid var(--luna-blue-1);
+  border-radius: 8px 8px 0 0;
+  box-shadow: 2px 4px 14px rgba(0, 0, 30, 0.45);
+  /* Luna blue frame */
+  padding: 0 3px 3px 3px;
+  background:
+    linear-gradient(var(--luna-blue-2), var(--luna-blue-2)) padding-box,
+    linear-gradient(#2b7bf0, #0a3d9e) border-box;
+}
+
+#main-window {
+  width: min(92vw, 900px);
+}
+
+.title-bar {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 0 6px;
+  border-radius: 7px 7px 0 0;
+  background: linear-gradient(
+    #2b7bf0 0%, #1560e0 8%, #0058ee 40%, #0154e2 60%, #0a3d9e 100%
+  );
+  color: #fff;
+  cursor: default;
+  user-select: none;
+  flex: 0 0 auto;
+}
+
+.title-bar-text {
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,.6);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.title-icon { width: 16px; height: 16px; }
+
+.title-bar-controls { display: flex; gap: 2px; }
+
+.tb-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,.7);
+  background: linear-gradient(#7ba7ef 0%, #3163c9 50%, #1f4ba8 100%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+}
+.tb-btn:hover { filter: brightness(1.2); }
+.tb-btn:active { filter: brightness(.85); }
+.tb-close {
+  background: linear-gradient(#f3a08a 0%, #e15132 45%, #b52a0b 100%);
+}
+
+/* ---------------- Menu / toolbar ---------------- */
+
+.menu-bar {
+  background: var(--luna-face);
+  display: flex;
+  gap: 2px;
+  padding: 2px 4px;
+  border-bottom: 1px solid #c6c3b4;
+  flex: 0 0 auto;
+}
+.menu-item {
+  padding: 2px 8px;
+  cursor: default;
+}
+.menu-item:hover { background: var(--luna-blue-3); color: #fff; }
+
+.toolbar {
+  background: linear-gradient(#fdfdfb, #eceadb);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-bottom: 1px solid #c6c3b4;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+.toolbar-label { font-weight: bold; color: #444; }
+
+.toolbar-sep {
+  width: 1px;
+  height: 22px;
+  background: #c6c3b4;
+  margin: 0 4px;
+}
+
+.style-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 3px 10px 3px 5px;
+  background: linear-gradient(#fff, #ece9d8);
+  border: 1px solid #aca899;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.style-btn:hover { border-color: var(--luna-blue-3); box-shadow: 0 0 0 1px #ffd77b inset; }
+.style-btn.active {
+  background: linear-gradient(#fce9a9, #f5cf6e);
+  border-color: #b8860b;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2) inset;
+  font-weight: bold;
+}
+
+.swatch {
+  width: 22px;
+  height: 16px;
+  border: 1px solid rgba(0,0,0,.4);
+  border-radius: 2px;
+  display: inline-block;
+}
+.swatch-anime { background: linear-gradient(135deg, #ff5c8a 0%, #ffb74d 40%, #4fc3f7 100%); }
+.swatch-manga { background: repeating-linear-gradient(45deg, #111 0 2px, #fff 2px 5px); }
+.swatch-retro { background: linear-gradient(135deg, #e8d5a3 0%, #c9a86a 50%, #8d7b52 100%); }
+.swatch-oil   { background: linear-gradient(135deg, #d98e3a 0%, #7d4a1e 45%, #33507a 100%); }
+
+.xp-check { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+
+/* ---------------- Viewport ---------------- */
+
+.viewport {
+  position: relative;
+  background: #000;
+  flex: 1 1 auto;
+  min-height: 200px;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 2px inset var(--luna-face-dark);
+}
+
+#video { display: none; }
+
+#output {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #000;
+}
+
+.overlay-msg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 20, 60, 0.72);
+  color: #fff;
+  text-align: center;
+  z-index: 5;
+}
+.overlay-msg.hidden { display: none; }
+.overlay-inner p { font-size: 13px; line-height: 1.6; margin-bottom: 14px; text-shadow: 0 1px 2px #000; }
+
+/* ---------------- Buttons / progress ---------------- */
+
+.xp-button {
+  font-family: inherit;
+  font-size: 11px;
+  padding: 3px 16px;
+  background: linear-gradient(#fff, #ece9d8);
+  border: 1px solid #003c74;
+  border-radius: 3px;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px #fff inset;
+}
+.xp-button:hover { box-shadow: 0 0 0 2px #ffd77b inset; }
+.xp-button:active { background: #ece9d8; }
+.xp-button.big { font-size: 14px; padding: 8px 26px; font-weight: bold; }
+
+.xp-progress {
+  width: 220px;
+  height: 18px;
+  margin: 0 auto 12px;
+  border: 1px solid #686868;
+  border-radius: 3px;
+  background: #fff;
+  overflow: hidden;
+  padding: 2px;
+}
+.xp-progress-blocks {
+  height: 100%;
+  width: 40%;
+  background: repeating-linear-gradient(
+    90deg, #2bd132 0 8px, transparent 8px 10px
+  );
+  animation: progress-slide 1.2s linear infinite;
+}
+@keyframes progress-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(560px); }
+}
+
+/* ---------------- Status bar ---------------- */
+
+.status-bar {
+  display: flex;
+  background: var(--luna-face);
+  border-top: 1px solid #fff;
+  flex: 0 0 auto;
+}
+.status-cell {
+  padding: 3px 8px;
+  border: 1px solid;
+  border-color: #aca899 #fff #fff #aca899;
+  margin: 2px 1px;
+  min-width: 90px;
+  color: #333;
+}
+.status-cell:last-child { margin-left: auto; }
+
+/* ---------------- Dialog ---------------- */
+
+.xp-dialog {
+  width: 360px;
+  z-index: 50;
+}
+.xp-dialog.hidden { display: none; }
+.dialog-body {
+  background: var(--luna-face);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 18px 14px;
+}
+.dialog-icon { font-size: 26px; }
+.dialog-text { font-size: 11px; line-height: 1.5; }
+.dialog-buttons {
+  background: var(--luna-face);
+  display: flex;
+  justify-content: center;
+  padding: 0 0 12px;
+}
+
+/* ---------------- Taskbar ---------------- */
+
+#taskbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--taskbar-h);
+  display: flex;
+  align-items: stretch;
+  background: linear-gradient(#3168d5 0%, #4993e6 6%, #2157c4 50%, #1941a5 95%);
+  border-top: 1px solid #6d9ff2;
+  z-index: 100;
+}
+
+#start-button {
+  font-family: inherit;
+  font-size: 15px;
+  font-style: italic;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0,0,0,.5);
+  border: none;
+  padding: 0 22px 0 12px;
+  background: linear-gradient(#7ede77 0%, #3faf34 45%, #2a8f21 50%, #1d7a16 100%);
+  border-radius: 0 12px 12px 0;
+  box-shadow: 2px 0 6px rgba(0,0,0,.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.start-flag { font-style: normal; }
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-size: 11px;
+  margin: 4px 0 4px 10px;
+  padding: 0 14px;
+  border-radius: 3px;
+  background: linear-gradient(#1c50b8, #16409a);
+  box-shadow: 0 1px 2px rgba(0,0,0,.35) inset;
+}
+
+#tray {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  background: linear-gradient(#1d9ae0 0%, #1276c0 50%, #0e5ea8 100%);
+  border-left: 1px solid #6dc2f2;
+  color: #fff;
+  box-shadow: 1px 0 3px rgba(0,0,0,.3) inset;
+}

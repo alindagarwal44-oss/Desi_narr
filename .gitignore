@@ -1,0 +1,3 @@
+# Optional local copy of MediaPipe runtime + model (see README "Offline use")
+vendor/
+node_modules/
