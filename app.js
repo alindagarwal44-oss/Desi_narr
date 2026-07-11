@@ -345,12 +345,15 @@ function drawFrame() {
     ctx.drawImage(glCanvas, 0, 0, W, H);
     ctx.restore();
 
-    // Quad border
+    // Quad border — ink pen: solid black under dashed white
     ctx.beginPath();
     ctx.moveTo(quad[0].x, quad[0].y);
     for (let i = 1; i < 4; i++) ctx.lineTo(quad[i].x, quad[i].y);
     ctx.closePath();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
+    ctx.strokeStyle = "rgba(17, 17, 17, 0.95)";
+    ctx.lineWidth = 6;
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
     ctx.lineWidth = 3;
     ctx.setLineDash([10, 6]);
     ctx.stroke();
