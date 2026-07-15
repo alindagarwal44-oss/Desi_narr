@@ -3,11 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AnimeCam.exe</title>
+<title>AnimeCam — Finger Frame Studio</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='3' width='14' height='10' rx='2' fill='%23ffd54f' stroke='%23795548'/%3E%3Ccircle cx='8' cy='8' r='3.5' fill='%2342a5f5' stroke='%23fff'/%3E%3Ccircle cx='8' cy='8' r='1.5' fill='%23111'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Hero / landing -->
+<section id="hero">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+
+  <nav class="hero-nav">
+    <div class="hero-logo">&#9889; AnimeCam</div>
+    <a class="ghost-btn" href="https://github.com/alindagarwal44-oss/Desi_narr" target="_blank" rel="noopener">GitHub &#8599;</a>
+  </nav>
+
+  <div class="hero-body">
+    <div class="hero-copy">
+      <span class="hero-badge">Real-time &middot; No install &middot; Runs in your browser</span>
+      <h1>Frame the world<br><span class="grad-text">with your fingers.</span></h1>
+      <p class="hero-sub">
+        Hold up both hands and make a window with your thumbs and index fingers &mdash;
+        everything inside it turns into live anime, manga, retro or oil-paint art.
+        Tilt your head to bend the style. Shake it to shuffle.
+      </p>
+      <div class="hero-ctas">
+        <button class="xp-button big" id="hero-launch">&#9654;&nbsp; Launch Studio</button>
+        <a class="ghost-btn big" href="#" id="hero-how">How it works</a>
+      </div>
+      <div class="hero-features">
+        <span class="feature-chip">&#9995; 2-hand tracking</span>
+        <span class="feature-chip">&#127912; 4 live styles</span>
+        <span class="feature-chip">&#128558; Head-motion FX</span>
+        <span class="feature-chip">&#128256; Auto mix</span>
+      </div>
+      <ol class="hero-steps" id="hero-steps">
+        <li><b>Launch</b> and allow camera access.</li>
+        <li>Raise <b>both hands</b> facing the camera.</li>
+        <li>Make a frame with your <b>thumbs + index fingers</b> &mdash; the inside becomes art.</li>
+        <li><b>Tilt</b> your head to steer the style, <b>shake</b> it to shuffle.</li>
+      </ol>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <div class="mock-card">
+        <div class="mock-video"></div>
+        <div class="mock-quad">
+          <span class="mock-corner mc-1"></span>
+          <span class="mock-corner mc-2"></span>
+          <span class="mock-corner mc-3"></span>
+          <span class="mock-corner mc-4"></span>
+        </div>
+      </div>
+      <span class="float-chip fc-1"><span class="swatch swatch-anime"></span> Anime</span>
+      <span class="float-chip fc-2"><span class="swatch swatch-manga"></span> Manga</span>
+      <span class="float-chip fc-3"><span class="swatch swatch-retro"></span> Retro</span>
+      <span class="float-chip fc-4"><span class="swatch swatch-oil"></span> Oil</span>
+    </div>
+  </div>
+</section>
 
 <div id="desktop">
 

@@ -773,7 +773,10 @@ function drawFrame() {
 }
 
 // ---------------------------------------------------------------- Startup
+let appStarted = false;
+
 async function start() {
+  if (appStarted) return;
   startScreen.classList.add("hidden");
   loadingScreen.classList.remove("hidden");
   try {
@@ -801,6 +804,7 @@ async function start() {
     await initTracking();
 
     loadingScreen.classList.add("hidden");
+    appStarted = true;
     requestAnimationFrame(drawFrame);
   } catch (err) {
     loadingScreen.classList.add("hidden");
@@ -815,6 +819,21 @@ async function start() {
 
 // ---------------------------------------------------------------- UI wiring
 document.getElementById("btn-start").addEventListener("click", start);
+
+// Hero landing
+const hero = document.getElementById("hero");
+document.getElementById("hero-launch").addEventListener("click", () => {
+  hero.classList.add("closed");
+  start(); // user gesture → camera permission prompt is allowed
+});
+document.getElementById("hero-how").addEventListener("click", (e) => {
+  e.preventDefault();
+  document.getElementById("hero-steps").classList.toggle("open");
+});
+// Dock brand button reopens the landing page
+document.getElementById("start-button").addEventListener("click", () => {
+  hero.classList.remove("closed");
+});
 
 document.querySelectorAll(".style-btn").forEach((btn) => {
   btn.addEventListener("click", () => setStyle(btn.dataset.style));
