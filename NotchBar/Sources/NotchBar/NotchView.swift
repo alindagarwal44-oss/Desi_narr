@@ -1,10 +1,8 @@
 import SwiftUI
 import Combine
 
-/// The visible notch. Three stages:
-/// - collapsed: black shape hugging the hardware notch, invisible
-/// - peek (hover): compact solid-black bar — icon, title, chevron
-/// - open (click): full glass panel — recent apps + clipboard
+/// The visible notch: a black shape with rounded bottom corners that hugs the
+/// hardware notch when collapsed and springs out into a control panel on hover.
 struct NotchView: View {
     @ObservedObject var state: NotchState
     @ObservedObject var clipboard: ClipboardStore
@@ -15,119 +13,51 @@ struct NotchView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let mode = state.mode
-            let size = shapeSize(in: geo.size)
+            let expanded = state.expanded
+            let width = expanded ? geo.size.width : min(state.collapsedSize.width, geo.size.width)
+            let height = expanded
+                ? min(panelHeight, geo.size.height)
+                : min(state.collapsedSize.height, geo.size.height)
             let shape = NotchShape(
-                topRadius: mode == .collapsed ? 6 : 24,
-                bottomRadius: mode == .collapsed ? 10 : (mode == .peek ? 18 : 24)
+                topRadius: expanded ? 24 : 6,
+                bottomRadius: expanded ? 24 : 10
             )
 
             shape
-                // Frosted material under a black tint: fully black when
-                // collapsed and peeking (Supaste-style solid bar), turning to
-                // translucent glass only in the open panel.
+                // Glassmorphic body: frosted material with a black tint that
+                // is opaque when collapsed (to blend with the bezel) and
+                // becomes translucent glass when expanded.
                 .fill(.ultraThinMaterial)
                 .overlay(
                     LinearGradient(
-                        colors: [.black, .black.opacity(mode == .open ? 0.15 : 1)],
+                        colors: [.black, .black.opacity(expanded ? 0.15 : 1)],
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
                 .overlay(
-                    shape.stroke(
-                        Color.white.opacity(mode == .collapsed ? 0 : 0.14),
-                        lineWidth: 1
-                    )
+                    shape.stroke(Color.white.opacity(expanded ? 0.14 : 0), lineWidth: 1)
                 )
                 .overlay(alignment: .top) {
-                    peekRow
-                        .opacity(mode == .peek ? 1 : 0)
-                        .allowsHitTesting(mode == .peek)
-                        .animation(.easeOut(duration: 0.15), value: mode)
-                }
-                .overlay(alignment: .top) {
                     panel
-                        .opacity(mode == .open ? 1 : 0)
-                        .scaleEffect(mode == .open ? 1 : 0.96, anchor: .top)
-                        .allowsHitTesting(mode == .open)
+                        .opacity(expanded ? 1 : 0)
+                        .scaleEffect(expanded ? 1 : 0.94, anchor: .top)
+                        .allowsHitTesting(expanded)
                         .animation(
-                            mode == .open
+                            expanded
                                 ? .easeOut(duration: 0.2).delay(0.08)
                                 : .easeIn(duration: 0.12),
-                            value: mode
+                            value: expanded
                         )
                 }
                 .clipShape(shape)
-                .frame(width: size.width, height: size.height)
-                .contentShape(shape)
+                .frame(width: width, height: height)
                 .onHover { state.onHoverChange?($0) }
-                .onTapGesture {
-                    if state.mode == .peek { state.onOpen?() }
-                }
-                .animation(.spring(response: 0.38, dampingFraction: 0.92), value: mode)
+                .animation(.spring(response: 0.38, dampingFraction: 0.92), value: expanded)
                 .animation(.spring(response: 0.38, dampingFraction: 0.92), value: clipboard.items.isEmpty)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .onReceive(clock) { now = $0 }
-    }
-
-    private func shapeSize(in avail: CGSize) -> CGSize {
-        switch state.mode {
-        case .collapsed:
-            return CGSize(
-                width: min(state.collapsedSize.width, avail.width),
-                height: min(state.collapsedSize.height, avail.height)
-            )
-        case .peek:
-            return CGSize(
-                width: min(peekWidth, avail.width),
-                height: min(state.collapsedSize.height + 52, avail.height)
-            )
-        case .open:
-            return CGSize(width: avail.width, height: min(panelHeight, avail.height))
-        }
-    }
-
-    private var peekWidth: CGFloat {
-        min(state.collapsedSize.width + 240, state.expandedSize.width)
-    }
-
-    // ------------------------------------------------------------- peek bar
-
-    private var peekRow: some View {
-        HStack(spacing: 10) {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(LinearGradient(colors: [.cyan, .blue], startPoint: .top, endPoint: .bottom))
-                .frame(width: 30, height: 30)
-                .overlay(
-                    Image(systemName: "sparkles.rectangle.stack")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(.white)
-                )
-            VStack(alignment: .leading, spacing: 1) {
-                Text("NotchBar")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(.white)
-                Text("Recent apps & clipboard")
-                    .font(.system(size: 10))
-                    .foregroundColor(.secondary)
-            }
-            Spacer()
-            Button {
-                state.onOpen?()
-            } label: {
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(.white.opacity(0.85))
-                    .frame(width: 26, height: 26)
-                    .background(Circle().fill(Color.white.opacity(0.12)))
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.top, state.collapsedSize.height + 8)
-        .padding(.horizontal, 40)
-        .frame(width: peekWidth, alignment: .center)
     }
 
     // ------------------------------------------------------ expanded panel
@@ -200,7 +130,9 @@ struct NotchView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            }
 
+            if !clipboard.items.isEmpty {
                 HStack {
                     Button("Clear") { clipboard.clear() }
                         .buttonStyle(.plain)
