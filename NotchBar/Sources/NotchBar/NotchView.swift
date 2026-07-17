@@ -17,8 +17,8 @@ struct NotchView: View {
             let width = expanded ? geo.size.width : min(state.collapsedSize.width, geo.size.width)
             let height = expanded ? geo.size.height : min(state.collapsedSize.height, geo.size.height)
             let shape = NotchShape(
-                topRadius: expanded ? 12 : 6,
-                bottomRadius: expanded ? 20 : 10
+                topRadius: expanded ? 24 : 6,
+                bottomRadius: expanded ? 24 : 10
             )
 
             shape
@@ -28,7 +28,7 @@ struct NotchView: View {
                 .fill(.ultraThinMaterial)
                 .overlay(
                     LinearGradient(
-                        colors: [.black, .black.opacity(expanded ? 0.35 : 1)],
+                        colors: [.black, .black.opacity(expanded ? 0.15 : 1)],
                         startPoint: .top,
                         endPoint: .bottom
                     )
@@ -138,10 +138,11 @@ struct NotchView: View {
                 .buttonStyle(.plain)
             }
         }
-        // Keep content below the physical notch, which occludes the top strip.
+        // Keep content below the physical notch, which occludes the top strip,
+        // and inside the curved sides (24pt ear sweep + breathing room).
         .padding(.top, state.collapsedSize.height + 4)
-        .padding(.horizontal, 14)
-        .padding(.bottom, 10)
+        .padding(.horizontal, 34)
+        .padding(.bottom, 12)
         .frame(
             width: NotchController.expandedSize.width,
             height: NotchController.expandedSize.height,
