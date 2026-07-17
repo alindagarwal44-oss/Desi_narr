@@ -176,12 +176,16 @@ struct NotchShape: Shape {
     }
 
     func path(in rect: CGRect) -> Path {
+        // The ear eases over ~1.8x its width so the transition from the
+        // screen edge into the straight side is gradual, not an abrupt cut.
+        let earH = min(topRadius * 1.8, (rect.height - bottomRadius) * 0.9)
         var p = Path()
         p.move(to: CGPoint(x: rect.minX, y: rect.minY))
-        // top-left ear: sweep from the screen edge down into the side
-        p.addQuadCurve(
-            to: CGPoint(x: rect.minX + topRadius, y: rect.minY + topRadius),
-            control: CGPoint(x: rect.minX + topRadius, y: rect.minY)
+        // top-left ear: long eased sweep from the screen edge into the side
+        p.addCurve(
+            to: CGPoint(x: rect.minX + topRadius, y: rect.minY + earH),
+            control1: CGPoint(x: rect.minX + topRadius * 0.85, y: rect.minY),
+            control2: CGPoint(x: rect.minX + topRadius, y: rect.minY + earH * 0.4)
         )
         p.addLine(to: CGPoint(x: rect.minX + topRadius, y: rect.maxY - bottomRadius))
         p.addQuadCurve(
@@ -193,11 +197,12 @@ struct NotchShape: Shape {
             to: CGPoint(x: rect.maxX - topRadius, y: rect.maxY - bottomRadius),
             control: CGPoint(x: rect.maxX - topRadius, y: rect.maxY)
         )
-        p.addLine(to: CGPoint(x: rect.maxX - topRadius, y: rect.minY + topRadius))
-        // top-right ear
-        p.addQuadCurve(
+        p.addLine(to: CGPoint(x: rect.maxX - topRadius, y: rect.minY + earH))
+        // top-right ear, mirrored
+        p.addCurve(
             to: CGPoint(x: rect.maxX, y: rect.minY),
-            control: CGPoint(x: rect.maxX - topRadius, y: rect.minY)
+            control1: CGPoint(x: rect.maxX - topRadius, y: rect.minY + earH * 0.4),
+            control2: CGPoint(x: rect.maxX - topRadius * 0.85, y: rect.minY)
         )
         p.closeSubpath()
         return p
