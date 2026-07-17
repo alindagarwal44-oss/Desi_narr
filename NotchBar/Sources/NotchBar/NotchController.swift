@@ -10,10 +10,11 @@ final class NotchController {
     let recentApps = RecentAppsStore()
 
     private var panel: NSPanel
+    private var tabPanel: NSPanel
     private var collapseWork: DispatchWorkItem?
 
-    init() {
-        panel = NSPanel(
+    private static func makePanel() -> NSPanel {
+        let panel = NSPanel(
             contentRect: .zero,
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
@@ -27,6 +28,12 @@ final class NotchController {
         panel.hidesOnDeactivate = false
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
         panel.acceptsMouseMovedEvents = true
+        return panel
+    }
+
+    init() {
+        panel = Self.makePanel()
+        tabPanel = Self.makePanel()
 
         state.collapsedSize = Self.collapsedSize(for: targetScreen)
         state.expandedSize = Self.expandedSize(for: targetScreen)
@@ -41,6 +48,7 @@ final class NotchController {
         panel.contentView = NSHostingView(
             rootView: NotchView(state: state, clipboard: clipboard, recentApps: recentApps)
         )
+        tabPanel.contentView = NSHostingView(rootView: StatusTabView(state: state))
 
         NotificationCenter.default.addObserver(
             forName: NSApplication.didChangeScreenParametersNotification,
@@ -52,6 +60,7 @@ final class NotchController {
     func show() {
         reposition()
         panel.orderFrontRegardless()
+        tabPanel.orderFrontRegardless()
     }
 
     // ------------------------------------------------------------- geometry
@@ -105,10 +114,23 @@ final class NotchController {
         )
     }
 
+    /// The status tab: a notch-height square hanging just right of the notch.
+    private func tabFrame() -> NSRect {
+        guard let screen = targetScreen else { return .zero }
+        let side = state.collapsedSize.height
+        return NSRect(
+            x: screen.frame.midX + state.collapsedSize.width / 2 + 6,
+            y: screen.frame.maxY - side,
+            width: side,
+            height: side
+        )
+    }
+
     private func reposition() {
         state.collapsedSize = Self.collapsedSize(for: targetScreen)
         state.expandedSize = Self.expandedSize(for: targetScreen)
         panel.setFrame(frame(expanded: state.expanded), display: true)
+        tabPanel.setFrame(tabFrame(), display: true)
     }
 
     // ---------------------------------------------------- expand / collapse
@@ -121,6 +143,11 @@ final class NotchController {
         // has a settled layout to animate from — changing both in the same
         // tick makes the opening stutter or snap.
         panel.setFrame(frame(expanded: true), display: true)
+        // The expanded panel covers the tab's spot — fade it out of the way.
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = 0.12
+            tabPanel.animator().alphaValue = 0
+        }
         DispatchQueue.main.async { [weak self] in
             self?.state.expanded = true
         }
@@ -141,6 +168,10 @@ final class NotchController {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
             guard let self, !self.state.expanded else { return }
             self.panel.setFrame(self.frame(expanded: false), display: true)
+            NSAnimationContext.runAnimationGroup { ctx in
+                ctx.duration = 0.25
+                self.tabPanel.animator().alphaValue = 1
+            }
         }
     }
 }
