@@ -5,9 +5,11 @@ panel, like NotchNook / The Boring Notch — but yours.
 
 - **Collapsed**: a black shape hugging the physical notch, with a thin strip
   peeking below the bezel (that strip is the hover target).
-- **Hover it**: springs open into a panel with a live clock and a
-  **clipboard history** — the last 24 text snippets you copied anywhere on
-  your Mac. Click any snippet to copy it back; `Clear` wipes the list.
+- **Hover it**: springs open into a glassmorphic panel with a live clock,
+  a **recent apps** row (your 8 most recently used apps as frosted-glass
+  icon tiles — click one to switch to it), and a **clipboard history** —
+  the last 24 text snippets you copied anywhere on your Mac. Click any
+  snippet to copy it back; `Clear` wipes the list.
 - Works on Macs **without** a notch too (draws a small fake notch top-center),
   and on external displays.
 - No Dock icon; a ✨ status-bar item has the Quit menu (or use the ⏻ button
@@ -50,3 +52,7 @@ System Settings → General → Login Items → “+” → pick `NotchBar.app`.
 - File-drop shelf (drag files onto the notch)
 - Now-playing / media controls
 - Battery + calendar peek
+
+(`RecentAppsStore.swift` powers the recent-apps row: it seeds from the
+running-app list and reorders live via `NSWorkspace` app-activation
+notifications — no permissions needed.)

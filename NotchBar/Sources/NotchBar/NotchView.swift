@@ -6,6 +6,7 @@ import Combine
 struct NotchView: View {
     @ObservedObject var state: NotchState
     @ObservedObject var clipboard: ClipboardStore
+    @ObservedObject var recentApps: RecentAppsStore
     @State private var now = Date()
 
     private let clock = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
@@ -60,41 +61,55 @@ struct NotchView: View {
                     .foregroundColor(.secondary)
             }
 
-            if clipboard.items.isEmpty {
-                Spacer()
-                Text("Copy some text anywhere —\nyour clipboard history shows up here.")
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                Spacer()
-            } else {
-                ScrollView {
-                    LazyVStack(spacing: 6) {
-                        ForEach(clipboard.items, id: \.self) { item in
-                            Button {
-                                clipboard.copy(item)
-                            } label: {
-                                HStack(spacing: 8) {
-                                    Text(item)
-                                        .font(.system(size: 12))
-                                        .lineLimit(2)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                    Image(systemName: "doc.on.doc")
-                                        .font(.system(size: 10))
-                                        .foregroundColor(.secondary)
+            // Recent apps — frosted glass tiles, most recently used first.
+            VStack(alignment: .leading, spacing: 6) {
+                sectionLabel("Recent Apps")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(recentApps.apps) { app in
+                            AppTile(app: app) { recentApps.open(app) }
+                        }
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 6) {
+                sectionLabel("Clipboard")
+                if clipboard.items.isEmpty {
+                    Text("Copy some text anywhere — it shows up here.")
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .background(glass(cornerRadius: 11))
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 6) {
+                            ForEach(clipboard.items, id: \.self) { item in
+                                Button {
+                                    clipboard.copy(item)
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Text(item)
+                                            .font(.system(size: 12))
+                                            .lineLimit(2)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        Image(systemName: "doc.on.doc")
+                                            .font(.system(size: 10))
+                                            .foregroundColor(.secondary)
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 7)
+                                    .background(glass(cornerRadius: 10))
                                 }
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 7)
-                                .background(
-                                    Color.white.opacity(0.07),
-                                    in: RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                )
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
                         }
                     }
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 
             HStack {
                 Button("Clear") { clipboard.clear() }
@@ -122,5 +137,45 @@ struct NotchView: View {
             alignment: .top
         )
         .foregroundColor(.white)
+    }
+
+    private func sectionLabel(_ title: String) -> some View {
+        Text(title.uppercased())
+            .font(.system(size: 9, weight: .bold))
+            .kerning(1.1)
+            .foregroundColor(.secondary)
+    }
+}
+
+/// Apple-style frosted glass: translucent material with a hairline border.
+private func glass(cornerRadius: CGFloat) -> some View {
+    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        .fill(.ultraThinMaterial)
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+        )
+}
+
+/// One recent-app icon in a glass tile; lifts slightly on hover.
+private struct AppTile: View {
+    let app: RecentApp
+    let action: () -> Void
+    @State private var hovering = false
+
+    var body: some View {
+        Button(action: action) {
+            Image(nsImage: app.icon)
+                .resizable()
+                .interpolation(.high)
+                .frame(width: 30, height: 30)
+                .padding(6)
+                .background(glass(cornerRadius: 11))
+        }
+        .buttonStyle(.plain)
+        .help(app.name)
+        .scaleEffect(hovering ? 1.1 : 1)
+        .animation(.spring(response: 0.25, dampingFraction: 0.7), value: hovering)
+        .onHover { hovering = $0 }
     }
 }

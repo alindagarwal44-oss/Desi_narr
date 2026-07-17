@@ -5,10 +5,11 @@ import SwiftUI
 /// borderless, non-activating window pinned above the menu bar layer, so it
 /// covers the notch area without stealing focus from whatever app is active.
 final class NotchController {
-    static let expandedSize = CGSize(width: 420, height: 280)
+    static let expandedSize = CGSize(width: 420, height: 340)
 
     let state = NotchState()
     let clipboard = ClipboardStore()
+    let recentApps = RecentAppsStore()
 
     private var panel: NSPanel
     private var collapseWork: DispatchWorkItem?
@@ -39,7 +40,7 @@ final class NotchController {
         }
 
         panel.contentView = NSHostingView(
-            rootView: NotchView(state: state, clipboard: clipboard)
+            rootView: NotchView(state: state, clipboard: clipboard, recentApps: recentApps)
         )
 
         NotificationCenter.default.addObserver(
