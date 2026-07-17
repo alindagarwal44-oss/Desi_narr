@@ -142,11 +142,12 @@ struct NotchView: View {
                 }
             }
         }
-        // Keep content below the physical notch, which occludes the top strip,
-        // and inside the curved sides (24pt ear sweep + breathing room).
+        // Keep content below the physical notch, which occludes the top strip.
+        // Horizontal: the curved sides inset the glass body by 24pt, so 40pt
+        // total leaves ~16pt of visible breathing room inside the edge.
         .padding(.top, state.collapsedSize.height + 4)
-        .padding(.horizontal, 28)
-        .padding(.bottom, 12)
+        .padding(.horizontal, 40)
+        .padding(.bottom, 14)
         .frame(
             width: state.expandedSize.width,
             height: panelHeight,
