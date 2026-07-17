@@ -16,11 +16,9 @@ struct NotchView: View {
             let expanded = state.expanded
             let width = expanded ? geo.size.width : min(state.collapsedSize.width, geo.size.width)
             let height = expanded ? geo.size.height : min(state.collapsedSize.height, geo.size.height)
-            let radius: CGFloat = expanded ? 22 : 8
-            let shape = UnevenRoundedRectangle(
-                bottomLeadingRadius: radius,
-                bottomTrailingRadius: radius,
-                style: .continuous
+            let shape = NotchShape(
+                topRadius: expanded ? 12 : 6,
+                bottomRadius: expanded ? 20 : 10
             )
 
             shape
@@ -157,6 +155,51 @@ struct NotchView: View {
             .font(.system(size: 9, weight: .bold))
             .kerning(1.1)
             .foregroundColor(.secondary)
+    }
+}
+
+/// The notch outline. The top corners are concave "ears" that flare outward
+/// into the screen edge — the same curve the hardware notch has — instead of
+/// straight sides meeting the bezel at a hard angle. Bottom corners are
+/// normal convex rounds.
+struct NotchShape: Shape {
+    var topRadius: CGFloat
+    var bottomRadius: CGFloat
+
+    var animatableData: AnimatablePair<CGFloat, CGFloat> {
+        get { AnimatablePair(topRadius, bottomRadius) }
+        set {
+            topRadius = newValue.first
+            bottomRadius = newValue.second
+        }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        // top-left ear: sweep from the screen edge down into the side
+        p.addQuadCurve(
+            to: CGPoint(x: rect.minX + topRadius, y: rect.minY + topRadius),
+            control: CGPoint(x: rect.minX + topRadius, y: rect.minY)
+        )
+        p.addLine(to: CGPoint(x: rect.minX + topRadius, y: rect.maxY - bottomRadius))
+        p.addQuadCurve(
+            to: CGPoint(x: rect.minX + topRadius + bottomRadius, y: rect.maxY),
+            control: CGPoint(x: rect.minX + topRadius, y: rect.maxY)
+        )
+        p.addLine(to: CGPoint(x: rect.maxX - topRadius - bottomRadius, y: rect.maxY))
+        p.addQuadCurve(
+            to: CGPoint(x: rect.maxX - topRadius, y: rect.maxY - bottomRadius),
+            control: CGPoint(x: rect.maxX - topRadius, y: rect.maxY)
+        )
+        p.addLine(to: CGPoint(x: rect.maxX - topRadius, y: rect.minY + topRadius))
+        // top-right ear
+        p.addQuadCurve(
+            to: CGPoint(x: rect.maxX, y: rect.minY),
+            control: CGPoint(x: rect.maxX - topRadius, y: rect.minY)
+        )
+        p.closeSubpath()
+        return p
     }
 }
 
