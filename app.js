@@ -30,6 +30,11 @@ const chkDebug = document.getElementById("chk-debug");
 const chkAutoMix = document.getElementById("chk-automix");
 const errorDialog = document.getElementById("error-dialog");
 const errorText = document.getElementById("error-text");
+const notch = document.getElementById("notch");
+const notchStyleName = document.getElementById("notch-style-name");
+const notchHands = document.getElementById("notch-hands");
+const notchFps = document.getElementById("notch-fps");
+const notchAutoMix = document.getElementById("notch-automix");
 
 // ---------------------------------------------------------------- Shaders
 const VERT = `
@@ -502,14 +507,20 @@ function setStyle(key, { fromAuto = false } = {}) {
   styleSeed = Math.random() * 10;
   const auto = chkAutoMix.checked;
   statusStyle.textContent = `Style: ${STYLES[key].label}${auto ? " ★auto" : ""}`;
-  document.querySelectorAll(".style-btn").forEach((b) =>
+  document.querySelectorAll(".style-btn, .notch-style").forEach((b) =>
     b.classList.toggle("active", b.dataset.style === key)
   );
+  notchStyleName.textContent = STYLES[key].label;
   if (!fromAuto) {
     // manual pick: pause auto-mix so the choice sticks
     chkAutoMix.checked = false;
     statusStyle.textContent = `Style: ${STYLES[key].label}`;
+    syncNotchAutoMix();
   }
+}
+
+function syncNotchAutoMix() {
+  notchAutoMix.classList.toggle("on", chkAutoMix.checked);
 }
 
 function autoMixTick(now, maskActive) {
@@ -762,9 +773,14 @@ function drawFrame() {
     `Hands: ${Math.min(latestLandmarks.length, 2)}/2` + (headState.present ? " ·Head" : "");
   statusMask.textContent = quad ? "Mask: ACTIVE" : "Mask: inactive";
 
+  const handsTxt = `✋ ${Math.min(latestLandmarks.length, 2)}/2`;
+  if (notchHands.textContent !== handsTxt) notchHands.textContent = handsTxt;
+  notch.classList.toggle("mask-on", !!quad);
+
   frames++;
   if (now - fpsTimer >= 1000) {
     statusFps.textContent = `FPS: ${frames}`;
+    notchFps.textContent = `${frames} fps`;
     frames = 0;
     fpsTimer = now;
   }
@@ -805,6 +821,7 @@ async function start() {
 
     loadingScreen.classList.add("hidden");
     appStarted = true;
+    notch.classList.add("live");
     requestAnimationFrame(drawFrame);
   } catch (err) {
     loadingScreen.classList.add("hidden");
@@ -842,7 +859,35 @@ document.querySelectorAll(".style-btn").forEach((btn) => {
 chkAutoMix.addEventListener("change", () => {
   statusStyle.textContent =
     `Style: ${STYLES[currentStyle].label}${chkAutoMix.checked ? " ★auto" : ""}`;
+  syncNotchAutoMix();
 });
+
+// MacBook notch ------------------------------------------------------
+document.querySelectorAll(".notch-style").forEach((btn) => {
+  btn.addEventListener("click", () => setStyle(btn.dataset.style));
+});
+
+notchAutoMix.addEventListener("click", () => {
+  chkAutoMix.checked = !chkAutoMix.checked;
+  chkAutoMix.dispatchEvent(new Event("change"));
+});
+syncNotchAutoMix();
+
+// Cursor drifting toward the notch makes it lean out before fully expanding
+window.addEventListener("pointermove", (e) => {
+  const r = notch.getBoundingClientRect();
+  const near =
+    e.clientY < r.bottom + 48 && e.clientX > r.left - 70 && e.clientX < r.right + 70;
+  notch.classList.toggle("near", near);
+});
+
+// No hover on touch screens: tap opens, tapping elsewhere closes
+if (window.matchMedia("(hover: none)").matches) {
+  notch.addEventListener("click", () => notch.classList.add("open"));
+  document.addEventListener("click", (e) => {
+    if (!notch.contains(e.target)) notch.classList.remove("open");
+  });
+}
 
 window.addEventListener("keydown", (e) => {
   const keys = { 1: "anime", 2: "manga", 3: "retro", 4: "oil" };
@@ -958,6 +1003,8 @@ function tickClock() {
   h = h % 12 || 12;
   document.getElementById("clock").textContent =
     `${h}:${String(d.getMinutes()).padStart(2, "0")} ${ampm}`;
+  document.getElementById("notch-clock").textContent =
+    `${h}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 tickClock();
 setInterval(tickClock, 10_000);
