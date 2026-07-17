@@ -31,12 +31,15 @@ final class NotchController {
         state.collapsedSize = Self.collapsedSize(for: targetScreen)
         state.expandedSize = Self.expandedSize(for: targetScreen)
         state.onHoverChange = { [weak self] inside in
+            guard let self else { return }
             if inside {
-                self?.expand()
+                self.collapseWork?.cancel()
+                if self.state.mode == .collapsed { self.raise(to: .peek) }
             } else {
-                self?.scheduleCollapse()
+                self.scheduleCollapse()
             }
         }
+        state.onOpen = { [weak self] in self?.raise(to: .open) }
 
         panel.contentView = NSHostingView(
             rootView: NotchView(state: state, clipboard: clipboard, recentApps: recentApps)
@@ -108,21 +111,24 @@ final class NotchController {
     private func reposition() {
         state.collapsedSize = Self.collapsedSize(for: targetScreen)
         state.expandedSize = Self.expandedSize(for: targetScreen)
-        panel.setFrame(frame(expanded: state.expanded), display: true)
+        panel.setFrame(frame(expanded: state.mode != .collapsed), display: true)
     }
 
-    // ---------------------------------------------------- expand / collapse
+    // ------------------------------------------------- peek / open / collapse
 
-    private func expand() {
+    private func raise(to mode: NotchMode) {
         collapseWork?.cancel()
-        guard !state.expanded else { return }
-        // Grow the window first (instantly, it's transparent). Flip the
-        // animated state on the *next* runloop turn so the enlarged window
-        // has a settled layout to animate from — changing both in the same
-        // tick makes the opening stutter or snap.
+        guard state.mode != mode else { return }
+        // The window is sized for the full panel in both peek and open; the
+        // SwiftUI shape draws the smaller peek bar inside it.
         panel.setFrame(frame(expanded: true), display: true)
-        DispatchQueue.main.async { [weak self] in
-            self?.state.expanded = true
+        if state.mode == .collapsed {
+            // Flip the animated state on the *next* runloop turn so the
+            // enlarged window has a settled layout to animate from —
+            // changing both in the same tick makes the opening stutter.
+            DispatchQueue.main.async { [weak self] in self?.state.mode = mode }
+        } else {
+            state.mode = mode
         }
     }
 
@@ -134,12 +140,12 @@ final class NotchController {
     }
 
     private func collapse() {
-        guard state.expanded else { return }
-        state.expanded = false
+        guard state.mode != .collapsed else { return }
+        state.mode = .collapsed
         // Shrink the window only after the spring has fully settled —
         // shrinking mid-animation truncates the tail and looks like a snap.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
-            guard let self, !self.state.expanded else { return }
+            guard let self, self.state.mode == .collapsed else { return }
             self.panel.setFrame(self.frame(expanded: false), display: true)
         }
     }
