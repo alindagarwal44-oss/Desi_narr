@@ -64,12 +64,22 @@ struct NotchView: View {
 
     private var panel: some View {
         VStack(spacing: 8) {
-            HStack {
-                Image(systemName: "sparkles.rectangle.stack")
-                    .foregroundColor(.cyan)
-                Text("NotchBar")
-                    .font(.system(size: 13, weight: .bold))
-                Spacer()
+            ZStack {
+                HStack {
+                    Image(systemName: "sparkles.rectangle.stack")
+                        .foregroundColor(.cyan)
+                    Text("NotchBar")
+                        .font(.system(size: 13, weight: .bold))
+                    Spacer()
+                    Button {
+                        NSApp.terminate(nil)
+                    } label: {
+                        Image(systemName: "power")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
                 Text(now.formatted(date: .omitted, time: .shortened))
                     .font(.system(size: 12, weight: .semibold).monospacedDigit())
                     .foregroundColor(.secondary)
@@ -122,42 +132,34 @@ struct NotchView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
 
-            HStack {
-                if !clipboard.items.isEmpty {
+            if !clipboard.items.isEmpty {
+                HStack {
                     Button("Clear") { clipboard.clear() }
                         .buttonStyle(.plain)
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(.secondary)
+                    Spacer()
                 }
-                Spacer()
-                Button {
-                    NSApp.terminate(nil)
-                } label: {
-                    Image(systemName: "power")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.plain)
             }
         }
         // Keep content below the physical notch, which occludes the top strip,
         // and inside the curved sides (24pt ear sweep + breathing room).
         .padding(.top, state.collapsedSize.height + 4)
-        .padding(.horizontal, 34)
+        .padding(.horizontal, 28)
         .padding(.bottom, 12)
         .frame(
-            width: NotchController.expandedSize.width,
+            width: state.expandedSize.width,
             height: panelHeight,
             alignment: .top
         )
         .foregroundColor(.white)
     }
 
-    /// Panel is shorter while the clipboard section is hidden.
+    /// Panel is shorter while the clipboard section (and its footer) is hidden.
     private var panelHeight: CGFloat {
         clipboard.items.isEmpty
-            ? state.collapsedSize.height + 146
-            : NotchController.expandedSize.height
+            ? state.collapsedSize.height + 122
+            : state.expandedSize.height
     }
 
     private func sectionLabel(_ title: String) -> some View {

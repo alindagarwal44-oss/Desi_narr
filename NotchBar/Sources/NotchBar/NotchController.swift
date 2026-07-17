@@ -5,8 +5,6 @@ import SwiftUI
 /// borderless, non-activating window pinned above the menu bar layer, so it
 /// covers the notch area without stealing focus from whatever app is active.
 final class NotchController {
-    static let expandedSize = CGSize(width: 470, height: 240)
-
     let state = NotchState()
     let clipboard = ClipboardStore()
     let recentApps = RecentAppsStore()
@@ -31,6 +29,7 @@ final class NotchController {
         panel.acceptsMouseMovedEvents = true
 
         state.collapsedSize = Self.collapsedSize(for: targetScreen)
+        state.expandedSize = Self.expandedSize(for: targetScreen)
         state.onHoverChange = { [weak self] inside in
             if inside {
                 self?.expand()
@@ -86,9 +85,18 @@ final class NotchController {
         return CGSize(width: notch.width + 12, height: notch.height)
     }
 
+    /// Responsive: the panel scales with the screen instead of being fixed.
+    private static func expandedSize(for screen: NSScreen?) -> CGSize {
+        guard let screen else { return CGSize(width: 470, height: 240) }
+        return CGSize(
+            width: min(max(screen.frame.width * 0.28, 420), 560),
+            height: min(max(screen.frame.height * 0.25, 220), 280)
+        )
+    }
+
     private func frame(expanded: Bool) -> NSRect {
         guard let screen = targetScreen else { return .zero }
-        let size = expanded ? Self.expandedSize : state.collapsedSize
+        let size = expanded ? state.expandedSize : state.collapsedSize
         return NSRect(
             x: screen.frame.midX - size.width / 2,
             y: screen.frame.maxY - size.height,
@@ -99,6 +107,7 @@ final class NotchController {
 
     private func reposition() {
         state.collapsedSize = Self.collapsedSize(for: targetScreen)
+        state.expandedSize = Self.expandedSize(for: targetScreen)
         panel.setFrame(frame(expanded: state.expanded), display: true)
     }
 
