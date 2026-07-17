@@ -5,7 +5,7 @@ import SwiftUI
 /// borderless, non-activating window pinned above the menu bar layer, so it
 /// covers the notch area without stealing focus from whatever app is active.
 final class NotchController {
-    static let expandedSize = CGSize(width: 460, height: 330)
+    static let expandedSize = CGSize(width: 420, height: 280)
 
     let state = NotchState()
     let clipboard = ClipboardStore()
@@ -79,9 +79,9 @@ final class NotchController {
 
     private static func collapsedSize(for screen: NSScreen?) -> CGSize {
         let notch = notchSize(for: screen)
-        // A little wider and taller than the hardware notch so a thin black
-        // strip peeks out below the bezel — that strip is the hover target.
-        return CGSize(width: notch.width + 20, height: notch.height + 10)
+        // Hug the hardware notch tightly; just a sliver hangs below the bezel
+        // as the hover target (the notch area itself is also hoverable).
+        return CGSize(width: notch.width + 8, height: notch.height + 6)
     }
 
     private func frame(expanded: Bool) -> NSRect {

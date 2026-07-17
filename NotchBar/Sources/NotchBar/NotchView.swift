@@ -15,7 +15,7 @@ struct NotchView: View {
             let expanded = state.expanded
             let width = expanded ? geo.size.width : min(state.collapsedSize.width, geo.size.width)
             let height = expanded ? geo.size.height : min(state.collapsedSize.height, geo.size.height)
-            let radius: CGFloat = expanded ? 24 : 10
+            let radius: CGFloat = expanded ? 22 : 9
             let shape = UnevenRoundedRectangle(
                 bottomLeadingRadius: radius,
                 bottomTrailingRadius: radius,
@@ -27,12 +27,19 @@ struct NotchView: View {
                 .overlay(alignment: .top) {
                     panel
                         .opacity(expanded ? 1 : 0)
+                        .scaleEffect(expanded ? 1 : 0.94, anchor: .top)
                         .allowsHitTesting(expanded)
+                        .animation(
+                            expanded
+                                ? .easeOut(duration: 0.2).delay(0.08)
+                                : .easeIn(duration: 0.12),
+                            value: expanded
+                        )
                 }
                 .clipShape(shape)
                 .frame(width: width, height: height)
                 .onHover { state.onHoverChange?($0) }
-                .animation(.spring(response: 0.35, dampingFraction: 0.8), value: expanded)
+                .animation(.spring(response: 0.38, dampingFraction: 0.92), value: expanded)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .onReceive(clock) { now = $0 }
