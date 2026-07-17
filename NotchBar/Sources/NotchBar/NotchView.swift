@@ -24,7 +24,20 @@ struct NotchView: View {
             )
 
             shape
-                .fill(Color.black)
+                // Glassmorphic body: frosted material with a black tint that
+                // is opaque when collapsed (to blend with the bezel) and
+                // becomes translucent glass when expanded.
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    LinearGradient(
+                        colors: [.black, .black.opacity(expanded ? 0.35 : 1)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .overlay(
+                    shape.stroke(Color.white.opacity(expanded ? 0.14 : 0), lineWidth: 1)
+                )
                 .overlay(alignment: .top) {
                     panel
                         .opacity(expanded ? 1 : 0)
@@ -168,9 +181,9 @@ private struct AppTile: View {
             Image(nsImage: app.icon)
                 .resizable()
                 .interpolation(.high)
-                .frame(width: 26, height: 26)
-                .padding(5)
-                .background(glass(cornerRadius: 10))
+                .frame(width: 38, height: 38)
+                .padding(6)
+                .background(glass(cornerRadius: 13))
         }
         .buttonStyle(.plain)
         .help(app.name)
