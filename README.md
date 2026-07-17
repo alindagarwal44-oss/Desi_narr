@@ -58,6 +58,14 @@ Click **Start Camera**, allow camera access, and frame something with your hands
   tilt/position/speed into the shaders as uniforms. The whole scene is mirrored
   so it behaves like a mirror.
 
+## NotchBar — native macOS notch app
+
+The [`NotchBar/`](NotchBar/) folder contains a separate mini-project: a native
+macOS utility that turns your MacBook's **real** hardware notch into a
+hover-expandable panel (clipboard history, clock), like NotchNook or
+The Boring Notch. See [`NotchBar/README.md`](NotchBar/README.md) for build
+and run instructions — it's one `swift run` on your Mac.
+
 ## Files
 
 ```
