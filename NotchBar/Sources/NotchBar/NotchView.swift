@@ -49,7 +49,7 @@ struct NotchView: View {
     // ------------------------------------------------------ expanded panel
 
     private var panel: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             HStack {
                 Image(systemName: "sparkles.rectangle.stack")
                     .foregroundColor(.cyan)
@@ -100,7 +100,7 @@ struct NotchView: View {
                                             .foregroundColor(.secondary)
                                     }
                                     .padding(.horizontal, 10)
-                                    .padding(.vertical, 7)
+                                    .padding(.vertical, 6)
                                     .background(glass(cornerRadius: 10))
                                 }
                                 .buttonStyle(.plain)
@@ -128,9 +128,9 @@ struct NotchView: View {
             }
         }
         // Keep content below the physical notch, which occludes the top strip.
-        .padding(.top, state.collapsedSize.height + 8)
-        .padding(.horizontal, 16)
-        .padding(.bottom, 12)
+        .padding(.top, state.collapsedSize.height + 4)
+        .padding(.horizontal, 14)
+        .padding(.bottom, 10)
         .frame(
             width: NotchController.expandedSize.width,
             height: NotchController.expandedSize.height,
@@ -168,9 +168,9 @@ private struct AppTile: View {
             Image(nsImage: app.icon)
                 .resizable()
                 .interpolation(.high)
-                .frame(width: 30, height: 30)
-                .padding(6)
-                .background(glass(cornerRadius: 11))
+                .frame(width: 26, height: 26)
+                .padding(5)
+                .background(glass(cornerRadius: 10))
         }
         .buttonStyle(.plain)
         .help(app.name)

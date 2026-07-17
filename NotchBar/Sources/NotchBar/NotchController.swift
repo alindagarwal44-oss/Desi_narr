@@ -5,7 +5,7 @@ import SwiftUI
 /// borderless, non-activating window pinned above the menu bar layer, so it
 /// covers the notch area without stealing focus from whatever app is active.
 final class NotchController {
-    static let expandedSize = CGSize(width: 420, height: 340)
+    static let expandedSize = CGSize(width: 420, height: 300)
 
     let state = NotchState()
     let clipboard = ClipboardStore()
