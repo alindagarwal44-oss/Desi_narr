@@ -9,6 +9,44 @@
 </head>
 <body>
 
+<!-- MacBook-style notch: hover (or tap) to expand -->
+<div id="notch" role="region" aria-label="Quick controls">
+  <div class="notch-inner">
+    <div class="notch-bar">
+      <span class="notch-cam" title="Camera"></span>
+    </div>
+    <div class="notch-panel">
+      <div class="notch-head">
+        <span class="notch-title">
+          <span class="notch-cam"></span>
+          AnimeCam
+          <span class="notch-style-name" id="notch-style-name">Anime</span>
+        </span>
+        <span class="notch-clock" id="notch-clock">12:00</span>
+      </div>
+      <div class="notch-styles">
+        <button class="notch-style active" data-style="anime" title="Anime (key: 1)">
+          <span class="swatch swatch-anime"></span>Anime
+        </button>
+        <button class="notch-style" data-style="manga" title="Manga (key: 2)">
+          <span class="swatch swatch-manga"></span>Manga
+        </button>
+        <button class="notch-style" data-style="retro" title="Retro (key: 3)">
+          <span class="swatch swatch-retro"></span>Retro
+        </button>
+        <button class="notch-style" data-style="oil" title="Oil Paint (key: 4)">
+          <span class="swatch swatch-oil"></span>Oil
+        </button>
+      </div>
+      <div class="notch-stats">
+        <span class="notch-chip" id="notch-hands">&#9995; 0/2</span>
+        <span class="notch-chip" id="notch-fps">-- fps</span>
+        <button class="notch-chip notch-toggle" id="notch-automix" title="Toggle auto mix">&#128256; Auto mix</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Hero / landing -->
 <section id="hero">
   <div class="hero-blob hero-blob-1"></div>

@@ -34,6 +34,11 @@ Click **Start Camera**, allow camera access, and frame something with your hands
   Picking a style manually pauses auto mix.
 - **Trackers** checkbox: animated fingertip reticles, hand skeletons, and a
   head-tilt indicator.
+- **Notch**: a MacBook-style notch sits at the top of the screen. Bring the
+  cursor near it and it leans out; hover it and it expands into a quick-control
+  panel — style switcher, auto-mix toggle, live hand/FPS stats, and a clock.
+  Its rim glows cyan while the finger-frame mask is active. On touch screens,
+  tap to open, tap elsewhere to close.
 - **Head motion**: head tilt rotates the manga screentone and oil brush
   direction; head position shifts the anime/retro palette.
 - **`?demo` URL flag** (`http://localhost:8080/?demo`): forces a static mask so
