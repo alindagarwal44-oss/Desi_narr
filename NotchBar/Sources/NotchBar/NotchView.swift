@@ -15,7 +15,9 @@ struct NotchView: View {
         GeometryReader { geo in
             let expanded = state.expanded
             let width = expanded ? geo.size.width : min(state.collapsedSize.width, geo.size.width)
-            let height = expanded ? geo.size.height : min(state.collapsedSize.height, geo.size.height)
+            let height = expanded
+                ? min(panelHeight, geo.size.height)
+                : min(state.collapsedSize.height, geo.size.height)
             let shape = NotchShape(
                 topRadius: expanded ? 24 : 6,
                 bottomRadius: expanded ? 24 : 10
@@ -52,6 +54,7 @@ struct NotchView: View {
                 .frame(width: width, height: height)
                 .onHover { state.onHoverChange?($0) }
                 .animation(.spring(response: 0.38, dampingFraction: 0.92), value: expanded)
+                .animation(.spring(response: 0.38, dampingFraction: 0.92), value: clipboard.items.isEmpty)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .onReceive(clock) { now = $0 }
@@ -86,15 +89,12 @@ struct NotchView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            VStack(alignment: .leading, spacing: 6) {
-                sectionLabel("Clipboard")
-                if clipboard.items.isEmpty {
-                    Text("Copy some text anywhere — it shows up here.")
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, minHeight: 40)
-                        .background(glass(cornerRadius: 11))
-                } else {
+            // Clipboard only appears once something has been copied.
+            if clipboard.items.isEmpty {
+                Spacer(minLength: 0)
+            } else {
+                VStack(alignment: .leading, spacing: 6) {
+                    sectionLabel("Clipboard")
                     ScrollView {
                         LazyVStack(spacing: 6) {
                             ForEach(clipboard.items, id: \.self) { item in
@@ -119,14 +119,16 @@ struct NotchView: View {
                         }
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 
             HStack {
-                Button("Clear") { clipboard.clear() }
-                    .buttonStyle(.plain)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.secondary)
+                if !clipboard.items.isEmpty {
+                    Button("Clear") { clipboard.clear() }
+                        .buttonStyle(.plain)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.secondary)
+                }
                 Spacer()
                 Button {
                     NSApp.terminate(nil)
@@ -145,10 +147,17 @@ struct NotchView: View {
         .padding(.bottom, 12)
         .frame(
             width: NotchController.expandedSize.width,
-            height: NotchController.expandedSize.height,
+            height: panelHeight,
             alignment: .top
         )
         .foregroundColor(.white)
+    }
+
+    /// Panel is shorter while the clipboard section is hidden.
+    private var panelHeight: CGFloat {
+        clipboard.items.isEmpty
+            ? state.collapsedSize.height + 146
+            : NotchController.expandedSize.height
     }
 
     private func sectionLabel(_ title: String) -> some View {
