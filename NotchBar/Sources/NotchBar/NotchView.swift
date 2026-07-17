@@ -15,7 +15,7 @@ struct NotchView: View {
             let expanded = state.expanded
             let width = expanded ? geo.size.width : min(state.collapsedSize.width, geo.size.width)
             let height = expanded ? geo.size.height : min(state.collapsedSize.height, geo.size.height)
-            let radius: CGFloat = expanded ? 22 : 9
+            let radius: CGFloat = expanded ? 22 : 8
             let shape = UnevenRoundedRectangle(
                 bottomLeadingRadius: radius,
                 bottomTrailingRadius: radius,
@@ -113,7 +113,7 @@ struct NotchView: View {
             }
         }
         // Keep content below the physical notch, which occludes the top strip.
-        .padding(.top, state.collapsedSize.height + 2)
+        .padding(.top, state.collapsedSize.height + 8)
         .padding(.horizontal, 16)
         .padding(.bottom, 12)
         .frame(

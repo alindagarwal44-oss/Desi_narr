@@ -78,10 +78,10 @@ final class NotchController {
     }
 
     private static func collapsedSize(for screen: NSScreen?) -> CGSize {
-        let notch = notchSize(for: screen)
-        // Hug the hardware notch tightly; just a sliver hangs below the bezel
-        // as the hover target (the notch area itself is also hoverable).
-        return CGSize(width: notch.width + 8, height: notch.height + 6)
+        // Exactly the hardware notch: invisible against the bezel until
+        // hovered. The cursor can travel into the notch area, so the notch
+        // itself is the hover target.
+        notchSize(for: screen)
     }
 
     private func frame(expanded: Bool) -> NSRect {
@@ -105,10 +105,14 @@ final class NotchController {
     private func expand() {
         collapseWork?.cancel()
         guard !state.expanded else { return }
-        // Grow the window first (instantly, it's transparent), then let
-        // SwiftUI spring the black shape out to fill it.
+        // Grow the window first (instantly, it's transparent). Flip the
+        // animated state on the *next* runloop turn so the enlarged window
+        // has a settled layout to animate from — changing both in the same
+        // tick makes the opening stutter or snap.
         panel.setFrame(frame(expanded: true), display: true)
-        state.expanded = true
+        DispatchQueue.main.async { [weak self] in
+            self?.state.expanded = true
+        }
     }
 
     private func scheduleCollapse() {
@@ -121,8 +125,9 @@ final class NotchController {
     private func collapse() {
         guard state.expanded else { return }
         state.expanded = false
-        // Shrink the window only after the shape animation has finished.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+        // Shrink the window only after the spring has fully settled —
+        // shrinking mid-animation truncates the tail and looks like a snap.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
             guard let self, !self.state.expanded else { return }
             self.panel.setFrame(self.frame(expanded: false), display: true)
         }
